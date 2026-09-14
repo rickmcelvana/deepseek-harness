@@ -8,6 +8,7 @@ import {
   desktopBuildRecordFilename,
   resolveDesktopAutoUpdateConfig,
 } from './desktop-auto-update-environment.mjs'
+import { pnpmInvocation } from '../../../scripts/pnpm-invocation.ts'
 import { desktopTargetBuildPaths } from './desktop-build-paths.mjs'
 import { packageMacOSArtifacts, type DesktopPrepackagedArtifact } from './package-macos.ts'
 
@@ -250,12 +251,9 @@ function runPnpm(
   env: NodeJS.ProcessEnv = process.env,
   cwd: string = APP_ROOT,
 ): Promise<void> {
-  const pnpmEntry = process.env.npm_execpath
-  if (pnpmEntry === undefined || pnpmEntry === '') {
-    throw new Error('desktop package: invoke this script through a pnpm package command')
-  }
+  const pnpm = pnpmInvocation(args)
   return new Promise((resolvePromise, reject) => {
-    const child = spawn(process.execPath, [pnpmEntry, ...args], {
+    const child = spawn(pnpm.command, pnpm.args, {
       cwd,
       env,
       stdio: 'inherit',
