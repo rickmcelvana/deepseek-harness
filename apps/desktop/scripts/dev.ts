@@ -7,6 +7,7 @@ import { join, resolve } from 'node:path'
 import { parseArgs } from 'node:util'
 import { DESKTOP_HOST_PROTOCOL_VERSION } from '../src/host-protocol.ts'
 import type { DesktopRelease } from '../src/release.ts'
+import { pnpmInvocation } from '../../../scripts/pnpm-invocation.ts'
 import { prepareDevelopmentProject } from './development-project.ts'
 import { prepareDevelopmentApp } from './development-app.ts'
 import { preparePrimaryRuntime } from './prepare-primary-runtime.ts'
@@ -48,11 +49,8 @@ async function run(command: string, args: readonly string[], cwd: string, enviro
 }
 
 async function runPackageScript(script: string, cwd: string): Promise<void> {
-  const packageManager = process.env.npm_execpath
-  if (packageManager === undefined || packageManager === '') {
-    throw new Error('desktop development: invoke this launcher through pnpm run dev:desktop or start:desktop')
-  }
-  await run(process.execPath, [packageManager, 'run', script], cwd)
+  const pnpm = pnpmInvocation(['run', script])
+  await run(pnpm.command, pnpm.args, cwd)
 }
 
 async function launchElectron(): Promise<void> {

@@ -26,6 +26,15 @@ describe('pnpm invocation', () => {
     })
   })
 
+  it.each([
+    String.raw`C:\tools\pnpm.cmd`,
+    String.raw`C:\tools\pnpm.bat`,
+    String.raw`C:\Program Files\工具\$pnpm;\PNPM.CMD`,
+  ])('rejects the Windows command shim %j, which Node cannot spawn without a shell', (entrypoint) => {
+    expect(() => pnpmInvocation(['run', 'build'], { npm_execpath: entrypoint }))
+      .toThrow('cannot run without a shell')
+  })
+
   it.each([undefined, ''])('rejects an unavailable lifecycle entrypoint', (entrypoint) => {
     expect(() => pnpmInvocation([], { npm_execpath: entrypoint }))
       .toThrow('npm_execpath is unavailable; invoke the script through pnpm run')
