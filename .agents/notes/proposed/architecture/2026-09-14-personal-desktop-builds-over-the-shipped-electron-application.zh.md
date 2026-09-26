@@ -38,6 +38,10 @@ Electron 独占该 profile，因此只有壳自有 UI 会修改它：个人插�
 
 保留一个默认分支跟随上游的 fork，并用 `--ff-only` 拉取；被拒绝的拉取就是一个信号，说明存在本地提交，而它本应属于个人层。发布身份锁定意味着决定壳运行哪个 dsh 的是被拉取的提交，而不是版本范围。
 
+无法跟随默认分支的提交——本地打包修复或身份补丁——改放在命名分支上。当前补丁集位于 `local/desktop-build`，它是已发布提交的后代，承载 [Desktop 启动器 pnpm 入口修复](../../implemented/bug-fix/2026-09-14-desktop-launcher-pnpm-entrypoint.zh.md)、[Desktop 外壳运行时依赖闭包修复](../../implemented/bug-fix/2026-09-26-desktop-shell-runtime-dependencies.zh.md) 以及 `project-doc-site.spec.ts` 的 junction 夹具。更换机器时，通过克隆 fork、检出该分支、运行 `pnpm install` 并重新构建来恢复该工作状态；默认分支从不承载这些补丁，因此下一次拉取仍能快进。
+
+把该分支变基到拉取后的默认分支上，会将补丁应用到新发布，并针对它重新记录每篇 Agent Note。发布已采用的补丁直接丢弃，而不是去解决冲突。
+
 ### 构建并运行
 
 先在开发模式下运行，再生成个人安装包，两者都在 Windows x64 上进行。未签名打包需要 `DSH_DESKTOP_APP_ID` 和原生构建前置条件，且不写入更新元数据；Linux 不是受支持的 Desktop 发布目标。

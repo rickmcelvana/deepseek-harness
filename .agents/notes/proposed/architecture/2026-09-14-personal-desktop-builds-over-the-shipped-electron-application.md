@@ -38,6 +38,10 @@ Electron exclusively owns that profile, so only shell-owned UI mutates it: perso
 
 Keep a fork whose default branch follows upstream and pull with `--ff-only`; a rejected pull is the signal that a local commit exists and belongs in the personal layer instead. The lockstep release identity means the pulled commit, not a version range, decides which dsh the shell runs.
 
+Commits that cannot follow the default branch — a local packaging fix, or an identity patch — live on a named branch instead. The current patch set is on `local/desktop-build`, a descendant of the released commit that carries the [Desktop launcher pnpm entrypoint fix](../../implemented/bug-fix/2026-09-14-desktop-launcher-pnpm-entrypoint.md), the [Desktop shell runtime dependency closure fix](../../implemented/bug-fix/2026-09-26-desktop-shell-runtime-dependencies.md), and the `project-doc-site.spec.ts` junction fixture. Replacing a machine restores that working state by cloning the fork, checking the branch out, running `pnpm install`, and rebuilding; the default branch never carries the patches, so the next pull still fast-forwards.
+
+Rebasing the branch onto a pulled default branch applies the patches to the new release and re-records each Agent Note against it. A patch the release has adopted is dropped rather than resolved.
+
 ### Build and run it
 
 Development first, then a personal installer, both on Windows x64. Unsigned packaging needs `DSH_DESKTOP_APP_ID` and the native build prerequisites, and writes no update metadata; Linux is not a supported Desktop release target.
